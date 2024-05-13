@@ -31,11 +31,13 @@ enum class CtmHandling {
   kDrmOrIgnore, /* Handled by DRM is possible, otherwise displayed as is */
 };
 
+class HwcDisplay;
 class PipelineToFrontendBindingInterface {
  public:
   virtual ~PipelineToFrontendBindingInterface() = default;
   virtual bool BindDisplay(std::shared_ptr<DrmDisplayPipeline>);
   virtual bool UnbindDisplay(std::shared_ptr<DrmDisplayPipeline>);
+  virtual HwcDisplay * GetDisplay(std::shared_ptr<DrmDisplayPipeline>);
   virtual void FinalizeDisplayBinding();
 };
 
