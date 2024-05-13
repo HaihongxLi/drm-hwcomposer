@@ -52,6 +52,8 @@ class DrmHwcTwo : public PipelineToFrontendBindingInterface {
                : nullptr;
   }
 
+  HwcDisplay *GetDisplay(std::shared_ptr<DrmDisplayPipeline> pipeline) override;
+
   auto &GetResMan() {
     return resource_manager_;
   }
