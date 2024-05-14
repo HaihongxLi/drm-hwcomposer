@@ -99,7 +99,7 @@ class DrmDevice {
   auto GetNextModeId() {
     return ++mode_id_;
   }
-  
+
   void ResetModeId() {
     mode_id_ = 0;
   }
@@ -132,5 +132,6 @@ class DrmDevice {
 public:
   bool preferred_mode_limit_;
   bool planes_enabling_;
+  uint32_t planes_num_;
 };
 }  // namespace android
