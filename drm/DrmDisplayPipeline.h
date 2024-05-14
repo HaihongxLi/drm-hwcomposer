@@ -76,6 +76,8 @@ struct DrmDisplayPipeline {
 
   ~DrmDisplayPipeline();
 
+  auto AtomicDisablePipeline() -> int;
+
   DrmDevice *device;
 
   std::shared_ptr<BindingOwner<DrmConnector>> connector;
