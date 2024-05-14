@@ -52,9 +52,18 @@ class DrmMode {
     return std::string(mode_.name) + "@" + std::to_string(GetVRefresh());
   }
 
+  auto GetId() const {
+    return id_;
+  }
+
+  void SetId(uint32_t id) {
+    id_ = id;
+  }
+
   auto CreateModeBlob(const DrmDevice &drm) -> DrmModeUserPropertyBlobUnique;
 
  private:
   drmModeModeInfo mode_;
+  uint32_t id_ = 0;
 };
 }  // namespace android
