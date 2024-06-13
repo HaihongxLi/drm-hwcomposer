@@ -103,10 +103,13 @@ class BpService : public BpInterface<IService> {
     Parcel data;
     Parcel reply;
     data.writeInterfaceToken(getInterfaceDescriptor());
+    ALOGE("hwc %s:%d",__FUNCTION__,__LINE__);
     status_t ret = remote()->transact(TRANSACT_GET_CONTROLS, data, &reply);
+    ALOGE("hwc %s:%d",__FUNCTION__,__LINE__);
     if (ret != NO_ERROR) {
       ALOGW("%s() transact failed: %d", __FUNCTION__, ret);
     }
+    ALOGE("hwc %s:%d",__FUNCTION__,__LINE__);
     return interface_cast<IControls>(reply.readStrongBinder());
   }
 };
@@ -115,6 +118,9 @@ IMPLEMENT_META_INTERFACE(Service, "ia.hwc.IService");
 
 status_t BnService::onTransact(uint32_t code, const Parcel& data, Parcel* reply,
                                uint32_t flags) {
+  printf("hwc lhh %s:%s:%d, code %d", __FILE__,__FUNCTION__,__LINE__,code);
+  ALOGE("hwc lhh %s:%s:%d, code %u, IBinder::FIRST_CALL_TRANSACTION %u",
+   __FILE__,__FUNCTION__,__LINE__,code,IBinder::FIRST_CALL_TRANSACTION);
   switch (code) {
     case BpService::GET_HWC_VERSION: {
       CHECK_INTERFACE(IService, data, reply);
@@ -160,12 +166,16 @@ status_t BnService::onTransact(uint32_t code, const Parcel& data, Parcel* reply,
 
     case BpService::TRANSACT_GET_CONTROLS: {
       CHECK_INTERFACE(IService, data, reply);
+      printf("hwc lhh %s:%s:%d, code %d", __FILE__,__FUNCTION__,__LINE__,code);
       sp<IBinder> b = IInterface::asBinder(this->GetControls());
+      printf("hwc lhh %s:%s:%d, code %d", __FILE__,__FUNCTION__,__LINE__,code);
       reply->writeStrongBinder(b);
       return NO_ERROR;
     }
 
     default:
+      printf("hwc lhh %s:%s:%d", __FILE__,__FUNCTION__,__LINE__);
+      ALOGE("hwc lhh %s:%s:%d", __FILE__,__FUNCTION__,__LINE__);
       return BBinder::onTransact(code, data, reply, flags);
   }
 }

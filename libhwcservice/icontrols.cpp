@@ -621,6 +621,10 @@ IMPLEMENT_META_INTERFACE(Controls, "iahwc.controls");
 
 status_t BnControls::onTransact(uint32_t code, const Parcel &data,
                                 Parcel *reply, uint32_t flags) {
+  printf("hwc lhh %s:%s:%d, code %u", __FILE__,__FUNCTION__,__LINE__,code);
+  ALOGE("hwc lhh %s:%s:%d, code %u, IBinder::FIRST_CALL_TRANSACTION %u",
+   __FILE__,__FUNCTION__,__LINE__,code,IBinder::FIRST_CALL_TRANSACTION);
+
   switch (code) {
     case BpControls::TRANSACT_DISPLAY_SET_OVERSCAN: {
       CHECK_INTERFACE(IControls, data, reply);
@@ -916,6 +920,8 @@ status_t BnControls::onTransact(uint32_t code, const Parcel &data,
     }
 
     default:
+      printf("hwc lhh %s:%s:%d", __FILE__,__FUNCTION__,__LINE__);
+      ALOGE("hwc lhh %s:%s:%d", __FILE__,__FUNCTION__,__LINE__);
       return BBinder::onTransact(code, data, reply, flags);
   }
 }
