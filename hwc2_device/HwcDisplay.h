@@ -101,7 +101,7 @@ class HwcDisplay {
   HWC2::Error SetContentType(int32_t contentType);
 #endif
   HWC2::Error GetDisplayVsyncPeriod(uint32_t *outVsyncPeriod);
-
+  HWC2::Error GetPerFrameMetadataKeys(uint32_t *outNumKeys, int32_t *outKeys);
   HWC2::Error GetDozeSupport(int32_t *support);
   HWC2::Error GetHdrCapabilities(uint32_t *num_types, int32_t *types,
                                  float *max_luminance,
@@ -224,6 +224,11 @@ class HwcDisplay {
   uint16_t virtual_disp_width_{};
   uint16_t virtual_disp_height_{};
   int32_t color_mode_{};
+  std::vector<int32_t> current_color_mode_ = {HAL_COLOR_MODE_NATIVE,
+                                              HAL_COLOR_MODE_BT2020,
+                                              HAL_COLOR_MODE_BT2100_PQ,
+                                              HAL_COLOR_MODE_BT2100_HLG,
+                                              /*HAL_COLOR_MODE_DISPLAY_BT2020*/};
   static constexpr int kCtmRows = 3;
   static constexpr int kCtmCols = 3;
   std::shared_ptr<drm_color_ctm> color_matrix_;
