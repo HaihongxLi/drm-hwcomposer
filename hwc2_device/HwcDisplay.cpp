@@ -1080,7 +1080,8 @@ HWC2::Error HwcDisplay::GetRenderIntents(
 
   if (IsInHeadlessMode()) {
     *outNumIntents = 1;
-    outIntents[0] = HAL_RENDER_INTENT_COLORIMETRIC;
+    if (outIntents)
+      outIntents[0] = HAL_RENDER_INTENT_COLORIMETRIC;
     return HWC2::Error::None;
   }
 
