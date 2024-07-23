@@ -46,6 +46,7 @@ cc_defaults {
         "-DHWC2_INCLUDE_STRINGIFICATION",
         "-DHWC2_USE_CPP11",
         "-std=c++17",
+        "-DUSE_IMAPPER4_METADATA_API",
     ],
 
     relative_install_path: "hw",
@@ -108,7 +109,6 @@ cc_library_shared {
         ":drm_hwcomposer_common",
         "bufferinfo/legacy/BufferInfoLibdrm.cpp",
     ],
-    cflags: ["-DUSE_IMAPPER4_METADATA_API"],
 }
 
 cc_library_shared {
