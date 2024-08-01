@@ -24,6 +24,9 @@ cc_library_headers {
 cc_defaults {
     name: "hwcomposer.drm_defaults",
 
+    defaults: [
+        "android.hardware.graphics.composer3-ndk_shared",
+    ],
     shared_libs: [
         "libcutils",
         "libdrm",
@@ -35,7 +38,10 @@ cc_defaults {
         "libutils",
     ],
 
-    header_libs: ["drm_hwcomposer_headers"],
+    header_libs: [
+        "drm_hwcomposer_headers",
+        "android.hardware.graphics.composer3-command-buffer",
+    ],
 
     cflags: [
         "-Wall",
