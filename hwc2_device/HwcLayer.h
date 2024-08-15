@@ -80,7 +80,7 @@ class HwcLayer {
                                      const int32_t *keys,
                                      const float *metadata);
 
- private:
+ public:
   // sf_type_ stores the initial type given to us by surfaceflinger,
   // validated_type_ stores the type after running ValidateDisplay
   HWC2::Composition sf_type_ = HWC2::Composition::Invalid;
@@ -114,6 +114,7 @@ class HwcLayer {
     return !bi_get_failed_ && !fb_import_failed_ && buffer_handle_ != nullptr;
   }
 
+  buffer_handle_t GetBufferHandle() {return buffer_handle_;}
  private:
   void ImportFb();
   bool bi_get_failed_{};

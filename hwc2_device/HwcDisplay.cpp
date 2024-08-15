@@ -25,7 +25,8 @@
 #include "bufferinfo/BufferInfoGetter.h"
 #include "utils/log.h"
 #include "utils/properties.h"
-
+#include <cros_gralloc_helpers.h>
+#include <i915_private_android_types.h>
 namespace android {
 
 std::string HwcDisplay::DumpDelta(HwcDisplay::Stats delta) {
@@ -191,7 +192,7 @@ HWC2::Error HwcDisplay::Init() {
   client_layer_.SetLayerBlendMode(HWC2_BLEND_MODE_PREMULTIPLIED);
 
   SetColorMarixToIdentity();
-
+  gralloc_handler_.Init();
   return HWC2::Error::None;
 }
 
@@ -623,9 +624,7 @@ HWC2::Error HwcDisplay::CreateComposition(AtomicCommitArgs &a_args) {
   }
 
   a_args.composition = current_plan_;
-
   auto ret = GetPipe().atomic_state_manager->ExecuteAtomicCommit(a_args);
-
   if (ret) {
     if (!a_args.test_only)
       ALOGE("Failed to apply the frame composition ret=%d", ret);
@@ -832,7 +831,7 @@ HWC2::Error HwcDisplay::SetPowerMode(int32_t mode_in) {
       break;
     case HWC2::PowerMode::On:
       a_args.active = true;
-      a_args.color_adjustment = GetPipe().device->GetColorAdjustmentEnabling();
+      if (pipeline_) a_args.color_adjustment = GetPipe().device->GetColorAdjustmentEnabling();
       break;
     case HWC2::PowerMode::Doze:
     case HWC2::PowerMode::DozeSuspend:

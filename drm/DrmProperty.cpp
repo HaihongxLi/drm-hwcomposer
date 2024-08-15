@@ -24,7 +24,7 @@
 #include <cerrno>
 #include <cstdint>
 #include <string>
-
+#include <inttypes.h>
 #include "DrmDevice.h"
 #include "utils/log.h"
 

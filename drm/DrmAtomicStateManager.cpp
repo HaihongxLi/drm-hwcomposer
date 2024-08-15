@@ -50,7 +50,7 @@ auto DrmAtomicStateManager::CreateInstance(DrmDisplayPipeline *pipe)
 auto DrmAtomicStateManager::CommitFrame(AtomicCommitArgs &args) -> int {
   // NOLINTNEXTLINE(misc-const-correctness)
   ATRACE_CALL();
-
+  
   if (args.active && *args.active == active_frame_state_.crtc_active_state) {
     /* Don't set the same state twice */
     args.active.reset();

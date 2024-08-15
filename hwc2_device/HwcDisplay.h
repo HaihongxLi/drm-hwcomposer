@@ -29,7 +29,7 @@
 #include "drm/ResourceManager.h"
 #include "drm/VSyncWorker.h"
 #include "hwc2_device/HwcLayer.h"
-
+#include "GrallocBufferHandler.h"
 namespace android {
 
 class Backend;
@@ -246,6 +246,7 @@ class HwcDisplay {
   HWC2::Error Init();
 
   HWC2::Error SetActiveConfigInternal(uint32_t config, int64_t change_time);
+  Gralloc1BufferHandler gralloc_handler_;
 };
 
 }  // namespace android

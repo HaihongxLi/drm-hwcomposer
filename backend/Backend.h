@@ -17,7 +17,7 @@
 #pragma once
 
 #include "hwc2_device/DrmHwcTwo.h"
-
+#include "GrallocBufferHandler.h"
 namespace android {
 
 class Backend {
@@ -28,7 +28,8 @@ class Backend {
   virtual std::tuple<int, size_t> GetClientLayers(
       HwcDisplay *display, const std::vector<HwcLayer *> &layers);
   virtual bool IsClientLayer(HwcDisplay *display, HwcLayer *layer);
-
+  Backend() {gralloc_handler_.Init();};
+Gralloc1BufferHandler gralloc_handler_;
  protected:
   static bool HardwareSupportsLayerType(HWC2::Composition comp_type);
   static uint32_t CalcPixOps(const std::vector<HwcLayer *> &layers,

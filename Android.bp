@@ -34,7 +34,10 @@ cc_defaults {
         "libui",
         "libutils",
     ],
-
+    include_dirs: [
+        "vendor/intel/external/drm-hwcomposer",
+        "hardware/intel/external/minigbm-intel/cros_gralloc",
+    ],
     header_libs: ["drm_hwcomposer_headers"],
 
     cflags: [
@@ -90,7 +93,7 @@ filegroup {
         "hwc2_device/HwcDisplayConfigs.cpp",
         "hwc2_device/HwcLayer.cpp",
         "hwc2_device/hwc2_device.cpp",
-
+	"GrallocBufferHandler.cpp",
         "utils/fd.cpp",
     ],
 }
