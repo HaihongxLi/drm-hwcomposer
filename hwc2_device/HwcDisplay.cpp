@@ -583,8 +583,6 @@ HWC2::Error HwcDisplay::CreateComposition(AtomicCommitArgs &a_args) {
   std::vector<LayerData> composition_layers;
   for (std::pair<const uint32_t, HwcLayer *> &l : vpp_z_map) {
     l.second->PopulateLayerData(a_args.test_only);
-    if (l.second->GetLayerData().acquire_fence.Get() > 0)
-      sync_wait(l.second->GetLayerData().acquire_fence.Get(), -1);
     va_compose_layer_.addVaLayerMapData(l.first, l.second);
   }
 

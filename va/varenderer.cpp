@@ -15,7 +15,7 @@
 */
 #include "va/sysdeps.h"
 #include "varenderer.h"
-
+#include <sync/sync.h>
 #include <drm_fourcc.h>
 #include <math.h>
 #include <xf86drm.h>
@@ -97,6 +97,7 @@ bool VARenderer::Init(uint32_t fd) {
   if (ret == VA_STATUS_SUCCESS) {
     AllocateCache(DEFAULT_LAYER_NUM);
   }
+
   return ret == VA_STATUS_SUCCESS ? true : false;
 }
 
@@ -275,37 +276,45 @@ int VARenderer::getSurfaceIn(buffer_handle_t bufferHandle, VADisplay display, VA
     return -1;
   }
 
-  VASurfaceAttribExternalBuffers external;
-  memset(&external, 0, sizeof(external));
-  int32_t numplanes = gr_handle->numFds;
-  if (numplanes > 1)
-    --numplanes;
-  uint32_t rt_format = DrmFormatToRTFormat(format);
-  uint32_t total_planes = numplanes;
-  external.pixel_format = DrmFormatToVAFormat(format);
-  external.width = width;
-  external.height = height;
-  external.num_planes = total_planes;
-  uintptr_t prime_fds[total_planes];
-  for (unsigned int i = 0; i < total_planes; i++) {
-    external.pitches[i] = gr_handle->strides[i];
-    external.offsets[i] = gr_handle->offsets[i];
-    prime_fds[i] = gr_handle->fds[i];
+  auto bi = BufferInfoGetter::GetInstance()->GetBoInfo(bufferHandle);
+  const uint32_t rt_format = DrmFormatToRTFormat(format);
+  std::array<VASurfaceAttrib, 2> attribs;
+  VADRMPRIMESurfaceDescriptor desc{};
+
+  desc.fourcc = DrmFormatToVAFormat(format);
+  desc.width = width;
+  desc.height = height;
+  desc.num_objects = 1;
+  desc.objects[0].fd = gr_handle->fds[0];
+  desc.objects[0].size = gr_handle->total_size;
+  desc.objects[0].drm_format_modifier = bi->modifiers[0];
+  desc.num_layers = 1;
+  desc.layers[0].drm_format = format;
+  int planes = 1;
+  if (gr_handle->numFds > 1) {
+    for (int i = 1; i < gr_handle->numFds; i++) {
+      if (gr_handle->offsets[i] > 0)
+        ++planes;
+    }
   }
-  external.num_buffers = total_planes;
-  external.buffers = prime_fds;
-  external.data_size = gr_handle->total_size;
-  VASurfaceAttrib attribs[2];
+  desc.layers[0].num_planes = planes;
+  desc.layers[0].object_index[0] = 0;
+  for (unsigned i = 0; i < desc.layers[0].num_planes; ++i) {
+    desc.layers[0].offset[i] = gr_handle->offsets[i];
+    desc.layers[0].pitch[i] = gr_handle->strides[i];
+  }
+
+  attribs[0].type = (VASurfaceAttribType)VASurfaceAttribMemoryType;
   attribs[0].flags = VA_SURFACE_ATTRIB_SETTABLE;
-  attribs[0].type = VASurfaceAttribMemoryType;
   attribs[0].value.type = VAGenericValueTypeInteger;
-  attribs[0].value.value.i = VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME;
-  attribs[1].flags = VA_SURFACE_ATTRIB_SETTABLE;
+  attribs[0].value.value.i = VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2;
   attribs[1].type = VASurfaceAttribExternalBufferDescriptor;
+  attribs[1].flags = VA_SURFACE_ATTRIB_SETTABLE;
   attribs[1].value.type = VAGenericValueTypePointer;
-  attribs[1].value.value.p = &external;
-  VAStatus ret = vaCreateSurfaces(display, rt_format, external.width, external.height,
-				 surface, 1, attribs, 2);
+  attribs[1].value.value.p = (void *)&desc;
+
+  VAStatus ret = vaCreateSurfaces(display, rt_format, width, height,
+				 surface, 1, attribs.data(), attribs.size());
   if (ret != VA_STATUS_SUCCESS)
     ALOGE("Failed to create VASurface from drmbuffer with ret %d", ret);
   return ret;
@@ -407,6 +416,7 @@ bool VARenderer::startRender(HwcVaLayer* layer,uint32_t format){
     }
   }
   uint8_t index = 0;
+  uint8_t infence_number = 0;
   for (std::map<uint32_t, HwcLayer *>::reverse_iterator a = va_layer_map.rbegin(); a != va_layer_map.rend(); a++,index++) {
     ScopedVABufferID* pipeline_buffer = &pipeline_buffers[index];
     VAProcPipelineParameterBuffer pipe_param = {};
@@ -469,18 +479,18 @@ bool VARenderer::startRender(HwcVaLayer* layer,uint32_t format){
       return false;
     }
     va_buffer_id_[index] = pipeline_buffer->buffer();
+    if (a->second->GetLayerData().acquire_fence.Get() > 0)
+      sync_fds_[1 + infence_number++] = a->second->GetLayerData().acquire_fence.Get();
   }
   ret |= vaRenderPicture(va_display_, va_context_, &va_buffer_id_[0], va_layer_map.size());
   if (ret != VA_STATUS_SUCCESS) {
     ALOGE("Failed to vaRenderPicture, ret = %d\n", ret);
     return false;
   }
-
-  ret |= vaEndPicture(va_display_, va_context_);
+  ret |= vaEndPicture2(va_display_, va_context_, sync_fds_, infence_number);
   if (ret != VA_STATUS_SUCCESS) {
     ALOGE(" Failed to vaEndPicture, ret = %d\n", ret);
   }
-  vaSyncSurface(va_display_, surface_out);
   current_handle_position++;
   if (current_handle_position >= NATIVE_BUFFER_VECTOR_SIZE)
     current_handle_position = 0;

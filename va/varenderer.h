@@ -161,7 +161,7 @@ class VARenderer {
     }
     return native_active_handles.at(temp)->handle_;
   }
-
+  int GetOutFence() {return sync_fds_[0];}
  private:
   bool QueryVAProcFilterCaps(VAContextID context, VAProcFilterType type,
                              void* caps, uint32_t* num);
@@ -216,6 +216,7 @@ class VARenderer {
   const uint32_t DEFAULT_LAYER_NUM = 10;
   const uint32_t LAYER_STEP = 5;
   uint32_t layer_capacity_ = 0;
+  int32_t sync_fds_[64] = {0};
 };
 
 }  // namespace android

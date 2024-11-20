@@ -383,6 +383,7 @@ void HwcVaLayer::vaImportFb() {
   }
   media_renderer_->startRender(this, DRM_FORMAT_XBGR8888);
   buffer_handle_ = media_renderer_->getPreBuffer();
+  acquire_fence_ = UniqueFd(media_renderer_->GetOutFence());
   buffer_handle_updated_ = false;
   layer_data_.fb = {};
 
