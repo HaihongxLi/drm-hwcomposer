@@ -27,6 +27,7 @@
 #include "include/IResourceManager.h"
 
 namespace aidl::android::hardware::graphics::composer3::impl {
+using AidlHdcpLevels = aidl::android::hardware::drm::HdcpLevels;
 
 class ComposerClient : public BnComposerClient {
 public:
@@ -141,6 +142,9 @@ public:
     ndk::ScopedAStatus notifyExpectedPresent(int64_t displayId,
                                              const ClockMonotonicTimestamp& expectedPresentTime,
                                              int32_t maxFrameIntervalNs) override;
+    ndk::ScopedAStatus startHdcpNegotiation(int64_t display, const AidlHdcpLevels& levels) override;
+    ndk::ScopedAStatus getMaxLayerPictureProfiles(int64_t display, int32_t* maxProfiles) override;
+    ndk::ScopedAStatus getLuts(int64_t, const std::vector<Buffer>&, std::vector<Luts>* out_luts) override;
 
 protected:
     ::ndk::SpAIBinder createBinder() override;

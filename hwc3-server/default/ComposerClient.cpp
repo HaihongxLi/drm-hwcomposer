@@ -431,6 +431,17 @@ ndk::ScopedAStatus ComposerClient::notifyExpectedPresent(int64_t, const ClockMon
     return TO_BINDER_STATUS(EX_UNSUPPORTED);
 }
 
+ndk::ScopedAStatus ComposerClient::startHdcpNegotiation(int64_t display, const AidlHdcpLevels& levels) {
+    return TO_BINDER_STATUS(EX_UNSUPPORTED);
+}
+
+ndk::ScopedAStatus ComposerClient::getMaxLayerPictureProfiles(int64_t display, int32_t* maxProfiles) {
+    return TO_BINDER_STATUS(EX_UNSUPPORTED);
+}
+
+ndk::ScopedAStatus ComposerClient::getLuts(int64_t, const std::vector<Buffer>&, std::vector<Luts>* out_luts) {
+    return TO_BINDER_STATUS(EX_UNSUPPORTED);
+}
 
 void ComposerClient::HalEventCallback::onHotplug(int64_t display, bool connected) {
     DEBUG_FUNC();
